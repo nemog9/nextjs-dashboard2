@@ -1,6 +1,4 @@
 import { Suspense } from 'react';
-import { fetchCardData } from '../../lib/data';
-import CardWrapper, { Card } from '../../ui/dashboard/cards';
 import LatestInvoices from '../../ui/dashboard/latest-invoices';
 import RevenueChart from '../../ui/dashboard/revenue-chart';
 import { lusitana } from '../../ui/fonts';
@@ -9,6 +7,7 @@ import {
   LatestInvoicesSkeleton,
   RevenueChartSkeleton,
 } from '@/app/ui/skeletons';
+import CardWrapper from '@/app/ui/dashboard/cards';
 
 export default async function Page() {
   return (
