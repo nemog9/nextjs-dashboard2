@@ -12,6 +12,11 @@ export type State = {
     status?: string[];
   };
   message?: string | null;
+  formData?: {
+    customerId?: string;
+    amount?: string;
+    status?: string;
+  };
 };
 
 const FormSchema = z.object({
@@ -43,6 +48,11 @@ export async function createInvoice(prevState: State, formData: FormData) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Create Invoice.',
+      formData: {
+        customerId: formData.get('customerId')?.toString(),
+        amount: formData.get('amount')?.toString(),
+        status: formData.get('status')?.toString(),
+      },
     };
   }
 
@@ -65,12 +75,36 @@ export async function createInvoice(prevState: State, formData: FormData) {
   redirect('/dashboard/invoices');
 }
 
-export async function updateInvoice(id: string, formData: FormData) {
-  const { customerId, amount, status } = UpdateInvoice.parse({
+export async function updateInvoice(
+  id: string,
+  prevState: State,
+  formData: FormData
+) {
+  const validatedFields = UpdateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
+
+  if (!validatedFields.success) {
+    console.log('Validation Error - Form Data:', {
+      customerId: formData.get('customerId')?.toString(),
+      amount: formData.get('amount')?.toString(),
+      status: formData.get('status')?.toString(),
+    });
+
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Update Invoice.',
+      formData: {
+        customerId: formData.get('customerId')?.toString(),
+        amount: formData.get('amount')?.toString(),
+        status: formData.get('status')?.toString(),
+      },
+    };
+  }
+
+  const { customerId, amount, status } = validatedFields.data;
   const amountInCents = amount * 100;
 
   try {
@@ -82,6 +116,11 @@ export async function updateInvoice(id: string, formData: FormData) {
   } catch (error) {
     return {
       message: 'Database Error: Failed to Update Invoice.',
+      formData: {
+        customerId: formData.get('customerId')?.toString(),
+        amount: formData.get('amount')?.toString(),
+        status: formData.get('status')?.toString(),
+      },
     };
   }
 
